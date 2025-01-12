@@ -27,4 +27,44 @@
             return forecasts;
         }
     }
+
+    public interface IRepository<T>
+    {
+        T GetById(int id);
+
+        List<T> List();
+    }
+
+    public class Repository<T> : IRepository<T>
+    {
+        private readonly ILogger<Repository<T>> _logger;
+
+        public Repository(ILogger<Repository<T>> logger)
+        {
+            _logger = logger;
+        }
+
+        public List<T> List()
+        {
+            _logger.LogInformation("List method started.");
+            var items = new List<T>();
+            _logger.LogInformation("List method completed with {Count} items generated.", items.Count);
+            return items;
+        }
+
+        public T GetById(int id)
+        {
+            _logger.LogInformation("GetById method started with id: {Id}", id);
+            var item = default(T);
+            _logger.LogInformation("GetById method completed.");
+            return item;
+        }
+    }
+
+    public record Data(int Id, string Name);
+
+    public partial class DataRepository : Repository<Data>
+    {
+        private readonly IWeatherForecastService _weatherForecastService;
+    }
 }

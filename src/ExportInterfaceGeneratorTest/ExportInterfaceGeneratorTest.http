@@ -1,0 +1,6 @@
+@ExportInterfaceGeneratorTest_HostAddress = http://localhost:5165
+
+GET {{ExportInterfaceGeneratorTest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

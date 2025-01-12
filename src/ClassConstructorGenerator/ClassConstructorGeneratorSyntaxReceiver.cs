@@ -12,13 +12,21 @@ public class ClassConstructorGeneratorSyntaxReceiver : ISyntaxReceiver
 
     public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
     {
-        if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
-            && classDeclarationSyntax.ChildTokens().Any(y => y.IsKind(SyntaxKind.PartialKeyword))
-            && !classDeclarationSyntax.ChildTokens().Any(y => y.IsKind(SyntaxKind.StaticKeyword))
-            && !classDeclarationSyntax.ChildTokens().Any(y => y.IsKind(SyntaxKind.AbstractKeyword))
-            && !classDeclarationSyntax.AttributeLists.Any(z => z.Attributes.Any(a => a.Name.ToString().Contains("IgnoreConstructorGenerator"))))
+        if (syntaxNode is not ClassDeclarationSyntax classDeclarationSyntax) return;
+
+        var tokens = classDeclarationSyntax.ChildTokens().ToList();
+
+        if (!tokens.Any(y => y.IsKind(SyntaxKind.PartialKeyword))
+            || tokens.Any(y => y.IsKind(SyntaxKind.StaticKeyword) || y.IsKind(SyntaxKind.AbstractKeyword))
+            || HasIgnoreAttribute(classDeclarationSyntax))
         {
-            CandidateClasses.Add(classDeclarationSyntax);
+            return;
         }
+
+        CandidateClasses.Add(classDeclarationSyntax);
     }
+
+    private static bool HasIgnoreAttribute(ClassDeclarationSyntax classDeclaration) =>
+        classDeclaration.AttributeLists.Any(z =>
+            z.Attributes.Any(a => a.Name.ToString().Contains("IgnoreConstructorGenerator")));
 }
